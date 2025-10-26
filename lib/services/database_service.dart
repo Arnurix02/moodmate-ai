@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'language_service.dart';
 
 class DatabaseService {
   static const String _userIdKey = 'user_id';
@@ -16,7 +17,7 @@ class DatabaseService {
       await prefs.setString(_userIdKey, userId);
       await prefs.setString(_userCreatedKey, DateTime.now().toIso8601String());
 
-      await createNewChat('Первый чат');
+      await createNewChat(AppTexts.newChat);
     }
 
     return userId;
@@ -95,7 +96,8 @@ class DatabaseService {
         messages.add(message);
         chat['messages'] = messages;
 
-        if (messages.length == 1 && message['isUser'] == true) {
+        if (messages.where((m) => m['isUser'] == true).length == 1 &&
+            message['isUser'] == true) {
           chat['title'] = message['text'].length > 30
               ? '${message['text'].substring(0, 30)}...'
               : message['text'];
@@ -134,7 +136,7 @@ class DatabaseService {
       if (chats.isNotEmpty) {
         await setCurrentChat(chats.first['id']);
       } else {
-        await createNewChat('Новый чат');
+        await createNewChat(AppTexts.newChat);
       }
     }
   }

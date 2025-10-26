@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../services/cerebras_api_service.dart';
 import '../services/database_service.dart';
+import '../services/language_service.dart';
 
 class ChatProvider with ChangeNotifier {
   final CerebrasApiService _apiService = CerebrasApiService();
@@ -39,7 +40,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future<void> createNewChat() async {
-    final chatId = await _dbService.createNewChat('Новый чат');
+    final chatId = await _dbService.createNewChat(AppTexts.newChat);
     await switchChat(chatId);
   }
 
@@ -61,7 +62,7 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _currentChatId ??= await _dbService.createNewChat('Чат о настроении');
+      _currentChatId ??= await _dbService.createNewChat(AppTexts.moodChat);
 
       final response = await _apiService.getMoodSupport(mood, language);
 
@@ -78,7 +79,7 @@ class ChatProvider with ChangeNotifier {
     } catch (e) {
       print('Error sending mood message: $e');
       _messages.add({
-        'text': 'Упс! Что-то пошло не так. Попробуй ещё раз! 😊',
+        'text': AppTexts.tryAgain,
         'isUser': false,
         'timestamp': DateTime.now().toIso8601String(),
       });
@@ -91,7 +92,7 @@ class ChatProvider with ChangeNotifier {
   Future<void> sendMessage(String text, String language) async {
     if (text.trim().isEmpty) return;
 
-    _currentChatId ??= await _dbService.createNewChat('Новый чат');
+    _currentChatId ??= await _dbService.createNewChat(AppTexts.newChat);
 
     final userMessage = {
       'text': text,
@@ -130,7 +131,7 @@ class ChatProvider with ChangeNotifier {
     } catch (e) {
       print('Error in sendMessage: $e');
       _messages.add({
-        'text': 'Упс! Что-то пошло не так. Попробуй ещё раз! 😊',
+        'text': AppTexts.tryAgain,
         'isUser': false,
         'timestamp': DateTime.now().toIso8601String(),
       });
